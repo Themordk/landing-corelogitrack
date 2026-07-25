@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORE LogiTrack — WMS SaaS para AutoPeças e Operações Logísticas</title>
+<meta name="description" content="Sistema WMS SaaS para centros de distribuição de autopeças. Rastreabilidade total, gestão por tarefas e produtividade operacional em tempo real.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy-950:#070b14;
+  --navy-900:#0c1220;
+  --navy-800:#111a2e;
+  --navy-700:#1a2540;
+  --navy-600:#243356;
+  --blue-500:#3b82f6;
+  --blue-400:#60a5fa;
+  --blue-300:#93bbfd;
+  --blue-200:#bfdbfe;
+  --accent:#4f8cf7;
+  --accent-glow:rgba(79,140,247,.15);
+  --text-primary:#e2e8f0;
+  --text-secondary:#94a3b8;
+  --text-muted:#64748b;
+  --white:#ffffff;
+  --green-400:#4ade80;
+  --yellow-400:#facc15;
+  --red-400:#f87171;
+  --border:rgba(255,255,255,.06);
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--navy-950);
+  color:var(--text-primary);
+  line-height:1.6;
+  overflow-x:hidden;
+}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ===== UTILITIES ===== */
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.section{padding:100px 0}
+.section-label{
+  font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;margin-bottom:12px;
+}
+.section-title{
+  font-size:clamp(1.75rem,4vw,2.5rem);font-weight:800;
+  line-height:1.15;margin-bottom:16px;
+}
+.section-subtitle{
+  font-size:1.05rem;color:var(--text-secondary);max-width:640px;line-height:1.7;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 32px;border-radius:10px;font-weight:600;
+  font-size:.95rem;text-decoration:none;transition:all .25s;
+  cursor:pointer;border:none;
+}
+.btn-primary{
+  background:var(--accent);color:var(--white);
+  box-shadow:0 0 24px rgba(79,140,247,.3);
+}
+.btn-primary:hover{
+  background:#6ea0fa;
+  box-shadow:0 0 40px rgba(79,140,247,.45);
+  transform:translateY(-2px);
+}
+.btn-outline{
+  background:transparent;color:var(--accent);
+  border:1.5px solid rgba(79,140,247,.4);
+}
+.btn-outline:hover{
+  border-color:var(--accent);
+  background:var(--accent-glow);
+}
+
+/* ===== NAVBAR ===== */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px 0;
+  background:rgba(7,11,20,.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  transition:all .3s;
+}
+.navbar.scrolled{padding:10px 0;background:rgba(7,11,20,.95)}
+.navbar .container{display:flex;align-items:center;justify-content:space-between}
+.navbar-logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.navbar-logo img{height:36px}
+.navbar-logo span{font-weight:700;font-size:1.1rem;color:var(--white)}
+.navbar-logo .highlight{color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+.nav-links a{
+  color:var(--text-secondary);text-decoration:none;font-size:.9rem;
+  font-weight:500;transition:color .2s;
+}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{
+  padding:10px 24px;border-radius:8px;font-size:.85rem;
+  background:var(--accent);color:var(--white);text-decoration:none;
+  font-weight:600;transition:all .25s;
+}
+.nav-cta:hover{background:#6ea0fa;transform:translateY(-1px)}
+.mobile-toggle{display:none;background:none;border:none;color:var(--white);font-size:1.5rem;cursor:pointer}
+
+/* ===== HERO ===== */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding-top:80px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-200px;right:-200px;
+  width:800px;height:800px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,140,247,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-100px;left:-100px;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,140,247,.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero .container{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-content{position:relative;z-index:2}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:100px;margin-bottom:24px;
+  background:rgba(79,140,247,.1);border:1px solid rgba(79,140,247,.2);
+  font-size:.8rem;color:var(--accent);font-weight:500;
+}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green-400);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{
+  font-size:clamp(2.2rem,5vw,3.2rem);font-weight:900;
+  line-height:1.1;margin-bottom:20px;
+}
+.hero h1 .gradient{
+  background:linear-gradient(135deg,var(--blue-400),var(--blue-200));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-desc{
+  font-size:1.1rem;color:var(--text-secondary);
+  line-height:1.75;margin-bottom:32px;max-width:520px;
+}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:48px}
+.hero-stats{display:flex;gap:40px}
+.hero-stat-value{font-size:1.8rem;font-weight:800;color:var(--white)}
+.hero-stat-value .mono{color:var(--accent)}
+.hero-stat-label{font-size:.78rem;color:var(--text-muted);margin-top:2px}
+.hero-visual{position:relative;z-index:2;display:flex;justify-content:center;align-items:center}
+.hero-visual .mockup{
+  width:100%;max-width:520px;border-radius:16px;
+  background:var(--navy-800);border:1px solid var(--border);
+  padding:20px;box-shadow:0 40px 80px rgba(0,0,0,.4);
+  position:relative;
+}
+.mockup-header{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.mockup-dot{width:8px;height:8px;border-radius:50%;background:var(--navy-600)}
+.mockup-title{font-size:.75rem;color:var(--text-muted);margin-left:8px}
+.mockup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mockup-card{
+  background:var(--navy-700);border-radius:10px;padding:16px;
+  border:1px solid var(--border);
+}
+.mockup-card-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;margin-bottom:8px;
+}
+.mc-blue{background:rgba(59,130,246,.15);color:var(--blue-400)}
+.mc-green{background:rgba(74,222,128,.15);color:var(--green-400)}
+.mc-yellow{background:rgba(250,204,21,.15);color:var(--yellow-400)}
+.mc-red{background:rgba(248,113,113,.15);color:var(--red-400)}
+.mockup-card h4{font-size:.8rem;font-weight:600;margin-bottom:4px}
+.mockup-card p{font-size:.7rem;color:var(--text-muted)}
+.mockup-bar{
+  margin-top:12px;height:4px;border-radius:2px;background:var(--navy-600);
+  overflow:hidden;
+}
+.mockup-bar-fill{height:100%;border-radius:2px;transition:width 2s ease}
+.mb-blue{background:var(--blue-400);width:78%}
+.mb-green{background:var(--green-400);width:92%}
+.mb-yellow{background:var(--yellow-400);width:65%}
+.mb-red{background:var(--red-400);width:45%}
+
+/* ===== PAIN POINTS ===== */
+.pain-section{background:var(--navy-900);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.pain-card{
+  background:var(--navy-800);border-radius:14px;padding:28px;
+  border:1px solid var(--border);transition:all .3s;
+}
+.pain-card:hover{border-color:rgba(248,113,113,.2);transform:translateY(-4px)}
+.pain-icon{
+  width:44px;height:44px;border-radius:10px;
+  background:rgba(248,113,113,.1);color:var(--red-400);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;margin-bottom:16px;
+}
+.pain-card h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+.pain-card p{font-size:.88rem;color:var(--text-secondary);line-height:1.6}
+
+/* ===== FEATURES ===== */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.feature-card{
+  background:var(--navy-800);border-radius:14px;padding:28px;
+  border:1px solid var(--border);transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--blue-300));
+  opacity:0;transition:opacity .3s;
+}
+.feature-card:hover{border-color:rgba(79,140,247,.2);transform:translateY(-4px)}
+.feature-card:hover::before{opacity:1}
+.feature-icon{
+  width:48px;height:48px;border-radius:12px;
+  background:var(--accent-glow);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin-bottom:16px;
+}
+.feature-card h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:.88rem;color:var(--text-secondary);line-height:1.6}
+.feature-tag{
+  display:inline-block;padding:3px 10px;border-radius:6px;
+  font-size:.7rem;font-weight:600;margin-top:12px;
+  background:rgba(79,140,247,.1);color:var(--accent);
+}
+
+/* ===== BENEFITS ===== */
+.benefits-section{background:var(--navy-900);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.benefits-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px}
+.benefit-card{text-align:center;padding:32px 20px}
+.benefit-number{
+  font-size:2.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--blue-400),var(--green-400));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;margin-bottom:8px;line-height:1;
+}
+.benefit-label{font-size:.88rem;color:var(--text-secondary);line-height:1.5}
+
+/* ===== AUTO PEÇAS ===== */
+.autopecas-content{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:48px}
+.autopecas-list{list-style:none;display:flex;flex-direction:column;gap:16px}
+.autopecas-item{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:16px;border-radius:12px;background:var(--navy-800);
+  border:1px solid var(--border);transition:all .3s;
+}
+.autopecas-item:hover{border-color:rgba(79,140,247,.2)}
+.autopecas-item-icon{
+  width:36px;height:36px;border-radius:8px;flex-shrink:0;
+  background:var(--accent-glow);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;
+}
+.autopecas-item h4{font-size:.92rem;font-weight:600;margin-bottom:2px}
+.autopecas-item p{font-size:.82rem;color:var(--text-muted);line-height:1.5}
+.autopecas-visual{
+  background:var(--navy-800);border-radius:16px;padding:32px;
+  border:1px solid var(--border);
+}
+.autopecas-stat-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)}
+.autopecas-stat-row:last-child{border-bottom:none}
+.autopecas-stat-label{font-size:.85rem;color:var(--text-secondary)}
+.autopecas-stat-bar{flex:1;margin:0 16px;height:6px;border-radius:3px;background:var(--navy-600);overflow:hidden}
+.autopecas-stat-bar-fill{height:100%;border-radius:3px}
+.autopecas-stat-value{font-size:.85rem;font-weight:700;min-width:50px;text-align:right}
+
+/* ===== HOW IT WORKS ===== */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:48px;position:relative}
+.steps::before{
+  content:'';position:absolute;top:28px;left:10%;right:10%;
+  height:2px;background:linear-gradient(90deg,var(--accent),var(--blue-300),var(--accent));
+  opacity:.3;
+}
+.step{text-align:center;padding:0 16px;position:relative}
+.step-number{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 16px;
+  background:var(--navy-800);border:2px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:800;color:var(--accent);
+  position:relative;z-index:2;
+}
+.step h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.step p{font-size:.82rem;color:var(--text-muted);line-height:1.5}
+
+/* ===== CONSULTANT ===== */
+.consultant-section{background:var(--navy-900);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.consultant-content{display:grid;grid-template-columns:280px 1fr;gap:48px;align-items:center;margin-top:48px}
+.consultant-photo{
+  width:280px;height:360px;border-radius:16px;overflow:hidden;
+  border:2px solid var(--border);
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.consultant-photo img{width:100%;height:100%;object-fit:cover;object-position:top}
+.consultant-info h3{font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.consultant-info .role{font-size:.9rem;color:var(--accent);font-weight:600;margin-bottom:16px}
+.consultant-info p{font-size:.95rem;color:var(--text-secondary);line-height:1.7;margin-bottom:16px}
+.consultant-highlights{display:flex;gap:32px;margin-top:24px}
+.consultant-highlight{text-align:center}
+.consultant-highlight .num{font-size:1.5rem;font-weight:800;color:var(--accent)}
+.consultant-highlight .label{font-size:.75rem;color:var(--text-muted);margin-top:2px}
+
+/* ===== CTA ===== */
+.cta-section{text-align:center;padding:120px 0}
+.cta-section .section-title{max-width:700px;margin:0 auto 16px}
+.cta-section .section-subtitle{margin:0 auto 40px}
+.cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+/* ===== FOOTER ===== */
+.footer{
+  padding:48px 0 32px;
+  border-top:1px solid var(--border);
+  background:var(--navy-950);
+}
+.footer-content{display:flex;justify-content:space-between;align-items:center}
+.footer-logo{display:flex;align-items:center;gap:10px}
+.footer-logo img{height:28px}
+.footer-logo span{font-weight:600;font-size:.9rem;color:var(--text-secondary)}
+.footer-copy{font-size:.8rem;color:var(--text-muted)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .hero .container{grid-template-columns:1fr;text-align:center}
+  .hero-desc{margin:0 auto 32px}
+  .hero-actions{justify-content:center}
+  .hero-stats{justify-content:center}
+  .hero-visual{display:none}
+  .pain-grid,.features-grid{grid-template-columns:repeat(2,1fr)}
+  .benefits-grid{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr);gap:32px}
+  .steps::before{display:none}
+  .autopecas-content{grid-template-columns:1fr}
+  .consultant-content{grid-template-columns:1fr;text-align:center}
+  .consultant-photo{margin:0 auto}
+  .consultant-highlights{justify-content:center}
+}
+@media(max-width:640px){
+  .section{padding:64px 0}
+  .pain-grid,.features-grid{grid-template-columns:1fr}
+  .benefits-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .mobile-toggle{display:block}
+  .hero-stats{flex-direction:column;gap:16px;align-items:center}
+  .footer-content{flex-direction:column;gap:16px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="#" class="navbar-logo">
+      <img src="/logo.png" alt="CORE LogiTrack">
+      <span>CORE <span class="highlight">LogiTrack</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#problemas">Desafios</a></li>
+      <li><a href="#funcionalidades">Funcionalidades</a></li>
+      <li><a href="#resultados">Resultados</a></li>
+      <li><a href="#autopecas">AutoPeças</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+    </ul>
+    <a href="#contato" class="nav-cta">Agendar Demonstração</a>
+    <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')">☰</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        WMS SaaS — Pronto para operar
+      </div>
+      <h1>
+        Controle total do seu<br>
+        armazém em <span class="gradient">tempo real</span>
+      </h1>
+      <p class="hero-desc">
+        O CORE LogiTrack é uma plataforma WMS desenvolvida para centros de distribuição 
+        de autopeças e operações logísticas que precisam de rastreabilidade, produtividade 
+        e controle operacional de ponta a ponta.
+      </p>
+      <div class="hero-actions">
+        <a href="#contato" class="btn btn-primary">Agendar Demonstração →</a>
+        <a href="#funcionalidades" class="btn btn-outline">Conhecer o Sistema</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-value"><span class="mono">100%</span></div>
+          <div class="hero-stat-label">Rastreabilidade</div>
+        </div>
+        <div>
+          <div class="hero-stat-value"><span class="mono">SaaS</span></div>
+          <div class="hero-stat-label">Multi-tenant</div>
+        </div>
+        <div>
+          <div class="hero-stat-value"><span class="mono">Real</span></div>
+          <div class="hero-stat-label">Tempo Real</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="mockup">
+        <div class="mockup-header">
+          <span class="mockup-dot"></span>
+          <span class="mockup-dot"></span>
+          <span class="mockup-dot"></span>
+          <span class="mockup-title">Torre de Controle — Dashboard</span>
+        </div>
+        <div class="mockup-grid">
+          <div class="mockup-card">
+            <div class="mockup-card-icon mc-blue">📦</div>
+            <h4>Recebimento</h4>
+            <p>12 NFs hoje</p>
+            <div class="mockup-bar"><div class="mockup-bar-fill mb-blue"></div></div>
+          </div>
+          <div class="mockup-card">
+            <div class="mockup-card-icon mc-green">✅</div>
+            <h4>Separação</h4>
+            <p>89 pedidos</p>
+            <div class="mockup-bar"><div class="mockup-bar-fill mb-green"></div></div>
+          </div>
+          <div class="mockup-card">
+            <div class="mockup-card-icon mc-yellow">📋</div>
+            <h4>Inventário</h4>
+            <p>3 contagens</p>
+            <div class="mockup-bar"><div class="mockup-bar-fill mb-yellow"></div></div>
+          </div>
+          <div class="mockup-card">
+            <div class="mockup-card-icon mc-red">🚛</div>
+            <h4>Expedição</h4>
+            <p>7 cargas</p>
+            <div class="mockup-bar"><div class="mockup-bar-fill mb-red"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN POINTS -->
+<section class="section pain-section" id="problemas">
+  <div class="container">
+    <div class="section-label">Os desafios que você conhece</div>
+    <h2 class="section-title">Seu armazém ainda opera no escuro?</h2>
+    <p class="section-subtitle">
+      Distribuidores de autopeças lidam com milhares de SKUs, prazos apertados 
+      e margens que não perdoam erros. Sem um WMS, os problemas se acumulam.
+    </p>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="pain-icon">❌</div>
+        <h3>Erros de separação frequentes</h3>
+        <p>Peças trocadas, referências similares e devoluções que corroem sua margem. Cada erro custa tempo, frete e a confiança do cliente.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🔍</div>
+        <h3>Estoque invisível</h3>
+        <p>Você sabe que a peça está no armazém, mas ninguém encontra. Sem endereçamento e rastreabilidade, o estoque vira um labirinto.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">⏱️</div>
+        <h3>Produtividade sem métrica</h3>
+        <p>Quantas peças cada operador separa por hora? Qual o tempo médio de armazenagem? Sem dados, não há gestão — só improviso.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📊</div>
+        <h3>Inventários dolorosos</h3>
+        <p>Parar a operação para contar estoque é caro. E quando o inventário revela divergências de 15%, 20%... quem é o responsável?</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🔗</div>
+        <h3>ERP e armazém desconectados</h3>
+        <p>O ERP diz que tem 50 unidades, o armazém encontra 32. A falta de integração gera retrabalho e pedidos cancelados.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📱</div>
+        <h3>Operação dependente de papel</h3>
+        <p>Listas impressas, anotações à mão e planilhas. A informação se perde entre turnos e o gestor só descobre o problema no dia seguinte.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="funcionalidades">
+  <div class="container">
+    <div class="section-label">Funcionalidades do CORE LogiTrack</div>
+    <h2 class="section-title">Cada operação, rastreada. Cada tarefa, controlada.</h2>
+    <p class="section-subtitle">
+      Uma plataforma orientada a tarefas que transforma seu armazém em uma operação 
+      inteligente, mensurável e rastreável.
+    </p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3>Recebimento Inteligente</h3>
+        <p>Receba NFs do ERP automaticamente. Confira item a item com coletor. Armazene com sugestão de endereço e rastreie cada movimento.</p>
+        <span class="feature-tag">Integração ERP</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <h3>Endereçamento & Layout</h3>
+        <p>Gerencie setores, zonas, endereços e tipos de estoque. O sistema sabe onde cada peça deve ficar e onde ela realmente está.</p>
+        <span class="feature-tag">Gestão de Layout</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Separação por Ondas</h3>
+        <p>Agrupe pedidos em ondas de separação. Distribua tarefas automaticamente para operadores. Confira antes de expedir.</p>
+        <span class="feature-tag">Wave Picking</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Inventário Cíclico</h3>
+        <p>Contagens programadas sem parar a operação. Recontagens automáticas em divergências. Acerto de estoque rastreado no ledger.</p>
+        <span class="feature-tag">Sem paradas</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔃</div>
+        <h3>Abastecimento Automático</h3>
+        <p>Quando o picking atinge o nível mínimo, o sistema gera tarefas de ressuprimento automaticamente do pulmão para o picking.</p>
+        <span class="feature-tag">Automação</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Coletor Móvel (PWA)</h3>
+        <p>App instalável no celular do operador. Leitura de código de barras, feedback sonoro e vibração. Funciona mesmo offline.</p>
+        <span class="feature-tag">Mobile First</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Gestão por Tarefas</h3>
+        <p>Toda operação gera tarefas rastreáveis: quem fez, quando, onde, quanto tempo levou. O ciclo completo: criada → atribuída → concluída.</p>
+        <span class="feature-tag">Rastreabilidade Total</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Torre de Controle</h3>
+        <p>Dashboard em tempo real com visão de toda a operação. Veja o status de cada operador, cada tarefa, cada área do armazém.</p>
+        <span class="feature-tag">Tempo Real</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3>Integração com ERP</h3>
+        <p>Sincronize produtos, pedidos, NFs e estoque com seu ERP. Suporte nativo ao Omiê com arquitetura pronta para outros ERPs.</p>
+        <span class="feature-tag">API REST</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="section benefits-section" id="resultados">
+  <div class="container">
+    <div class="section-label">Resultados Reais</div>
+    <h2 class="section-title">O que um WMS bem implementado entrega</h2>
+    <p class="section-subtitle">
+      Números baseados em benchmarks do mercado de distribuição de autopeças 
+      com implementação de WMS profissional.
+    </p>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-number">99,5%</div>
+        <div class="benefit-label">Acuracidade de estoque alcançável com inventário cíclico e rastreabilidade</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">↓40%</div>
+        <div class="benefit-label">Redução de erros de separação com conferência por coletor e dupla checagem</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">↑30%</div>
+        <div class="benefit-label">Aumento de produtividade operacional com distribuição inteligente de tarefas</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-number">↓60%</div>
+        <div class="benefit-label">Redução do tempo de inventário com contagens cíclicas sem parada operacional</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTO PEÇAS -->
+<section class="section" id="autopecas">
+  <div class="container">
+    <div class="section-label">Feito para o seu segmento</div>
+    <h2 class="section-title">Especializado em distribuição de AutoPeças</h2>
+    <p class="section-subtitle">
+      O mercado de autopeças tem desafios únicos: alto volume de SKUs, peças similares, 
+      prazos críticos e margens apertadas. O CORE LogiTrack foi pensado para isso.
+    </p>
+    <div class="autopecas-content">
+      <ul class="autopecas-list">
+        <li class="autopecas-item">
+          <div class="autopecas-item-icon">🔧</div>
+          <div>
+            <h4>Milhares de SKUs sob controle</h4>
+            <p>Endereçamento inteligente, busca por código, descrição ou referência cruzada. Encontre qualquer peça em segundos.</p>
+          </div>
+        </li>
+        <li class="autopecas-item">
+          <div class="autopecas-item-icon">📦</div>
+          <div>
+            <h4>Gestão de embalagens</h4>
+            <p>Controle de unidades, caixas, pallets e conversões de embalagem. Essencial para peças com múltiplas unidades de medida.</p>
+          </div>
+        </li>
+        <li class="autopecas-item">
+          <div class="autopecas-item-icon">🚛</div>
+          <div>
+            <h4>Expedição por rotas</h4>
+            <p>Organize a separação e o carregamento por rotas de entrega. Otimize a sequência de carga do caminhão.</p>
+          </div>
+        </li>
+        <li class="autopecas-item">
+          <div class="autopecas-item-icon">📊</div>
+          <div>
+            <h4>Curva ABC automática</h4>
+            <p>Identifique quais peças giram mais e posicione-as estrategicamente no picking para reduzir tempo de separação.</p>
+          </div>
+        </li>
+        <li class="autopecas-item">
+          <div class="autopecas-item-icon">🏷️</div>
+          <div>
+            <h4>Etiquetagem integrada</h4>
+            <p>Gere etiquetas com código de barras e QR Code para endereços, HUs e volumes diretamente do sistema.</p>
+          </div>
+        </li>
+      </ul>
+      <div class="autopecas-visual">
+        <h4 style="font-size:.85rem;color:var(--text-muted);margin-bottom:20px;text-transform:uppercase;letter-spacing:.1em">Indicadores típicos — Distribuidor de AutoPeças</h4>
+        <div class="autopecas-stat-row">
+          <span class="autopecas-stat-label">Acuracidade de estoque</span>
+          <div class="autopecas-stat-bar"><div class="autopecas-stat-bar-fill" style="width:97%;background:var(--green-400)"></div></div>
+          <span class="autopecas-stat-value" style="color:var(--green-400)">97%</span>
+        </div>
+        <div class="autopecas-stat-row">
+          <span class="autopecas-stat-label">Taxa de separação correta</span>
+          <div class="autopecas-stat-bar"><div class="autopecas-stat-bar-fill" style="width:99%;background:var(--green-400)"></div></div>
+          <span class="autopecas-stat-value" style="color:var(--green-400)">99,2%</span>
+        </div>
+        <div class="autopecas-stat-row">
+          <span class="autopecas-stat-label">Pedidos/hora por operador</span>
+          <div class="autopecas-stat-bar"><div class="autopecas-stat-bar-fill" style="width:75%;background:var(--blue-400)"></div></div>
+          <span class="autopecas-stat-value" style="color:var(--blue-400)">+30%</span>
+        </div>
+        <div class="autopecas-stat-row">
+          <span class="autopecas-stat-label">Tempo de localização de peça</span>
+          <div class="autopecas-stat-bar"><div class="autopecas-stat-bar-fill" style="width:20%;background:var(--yellow-400)"></div></div>
+          <span class="autopecas-stat-value" style="color:var(--yellow-400)">↓80%</span>
+        </div>
+        <div class="autopecas-stat-row">
+          <span class="autopecas-stat-label">Devoluções por erro</span>
+          <div class="autopecas-stat-bar"><div class="autopecas-stat-bar-fill" style="width:15%;background:var(--accent)"></div></div>
+          <span class="autopecas-stat-value" style="color:var(--accent)">↓70%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="background:var(--navy-900);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="container">
+    <div class="section-label" style="text-align:center">Como funciona</div>
+    <h2 class="section-title" style="text-align:center">Da ativação à operação em poucas semanas</h2>
+    <p class="section-subtitle" style="text-align:center;margin:0 auto">
+      O CORE LogiTrack é SaaS — sem instalação de servidores, sem infraestrutura complexa. 
+      Seu ambiente fica pronto rapidamente.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Ativação do ambiente</h3>
+        <p>Criamos seu tenant exclusivo com acesso via subdomínio próprio: suaempresa.corelogitrack.com.br</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Configuração</h3>
+        <p>Cadastro de armazéns, setores, endereços, produtos e integração com seu ERP</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Treinamento</h3>
+        <p>Capacitação da equipe operacional no coletor móvel e da gestão no dashboard e relatórios</p>
+      </div>
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>Operação</h3>
+        <p>Go-live acompanhado com suporte dedicado nos primeiros dias de operação</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONSULTANT -->
+<section class="section consultant-section" id="sobre">
+  <div class="container">
+    <div class="section-label">Quem está por trás</div>
+    <h2 class="section-title">Tecnologia com experiência operacional</h2>
+    <p class="section-subtitle">
+      O CORE LogiTrack não nasceu numa sala de desenvolvimento. Nasceu dentro de armazéns, 
+      observando as dores reais de quem opera.
+    </p>
+    <div class="consultant-content">
+      <div class="consultant-photo">
+        <img src="/izaias.jpg" alt="Izaias - Consultor Logístico">
+      </div>
+      <div class="consultant-info">
+        <h3>Izaias</h3>
+        <div class="role">Fundador & Consultor Logístico</div>
+        <p>
+          Com anos de experiência em operações logísticas e centros de distribuição de autopeças, 
+          o CORE LogiTrack foi construído com o conhecimento de quem viveu os desafios operacionais 
+          no dia a dia do armazém.
+        </p>
+        <p>
+          Cada funcionalidade do sistema reflete uma necessidade real identificada em campo. 
+          Não vendemos promessas — entregamos soluções que já foram testadas na prática.
+        </p>
+        <div class="consultant-highlights">
+          <div class="consultant-highlight">
+            <div class="num">WMS</div>
+            <div class="label">Especialista</div>
+          </div>
+          <div class="consultant-highlight">
+            <div class="num">SaaS</div>
+            <div class="label">Multi-tenant</div>
+          </div>
+          <div class="consultant-highlight">
+            <div class="num">AutoPeças</div>
+            <div class="label">Segmento foco</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contato">
+  <div class="container">
+    <div class="section-label">Próximo passo</div>
+    <h2 class="section-title">Pronto para transformar sua operação?</h2>
+    <p class="section-subtitle">
+      Agende uma demonstração e veja como o CORE LogiTrack pode trazer 
+      controle, rastreabilidade e produtividade para seu armazém.
+    </p>
+    <div class="cta-actions">
+      <a href="https://wa.me/5500000000000?text=Olá!%20Gostaria%20de%20agendar%20uma%20demonstração%20do%20CORE%20LogiTrack" class="btn btn-primary" target="_blank" rel="noopener">
+        Falar pelo WhatsApp →
+      </a>
+      <a href="mailto:contato@corelogitrack.com.br" class="btn btn-outline">
+        Enviar Email
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img src="/logo.png" alt="CORE LogiTrack">
+        <span>CORE LogiTrack — Soluções em Logística</span>
+      </div>
+      <div class="footer-copy">© 2025 CORE Soluções em Logística. Todos os direitos reservados.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+});
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>
